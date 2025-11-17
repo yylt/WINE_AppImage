@@ -1,95 +1,94 @@
-<p align="center">
-    <img src="https://github.com/mmtrt/WINE_AppImage/raw/master/wine.svg" alt="WINE logo" width=128 height=128>
+## Wine AppImage 使用指南
 
-<h2 align="center">WINE AppImage</h2>
+本文档介绍如何使用 Wine AppImage 在 Linux 系统上安装和运行 Windows 应用程序。
 
-  <p align="center">WINE AppImage (unofficial) AppImages by GitHub Actions Continuous Integration
-    <br>
-    <a href="https://github.com/mmtrt/WINE_AppImage/issues/new">Report bug</a>
-    ·
-    <a href="https://github.com/mmtrt/WINE_AppImage/issues/new">Request feature</a>
-    ·
-    <a href="https://github.com/mmtrt/WINE_AppImage/releases">Download AppImage</a>
-  </p>
-</p>
+## 概述
 
-## Info
- * Now WINE AppImages are built with wow64 enabled WINE builds.
+Wine AppImage 是一个打包成 AppImage 格式的 Wine 兼容层，它让您无需复杂配置即可在 Linux 系统中运行 Windows 应用程序。此版本已启用 WOW64 支持，可同时运行 32 位和 64 位 Windows 程序。
 
-## Get Started
+## 系统要求
 
-Download the latest release from
+- Linux 操作系统
 
-| Stable | Devel | Staging |
-| ------- | --------- | --------- |
-| <img src="https://github.com/mmtrt/WINE_AppImage/raw/master/wine.svg" height=100> | <img src="https://github.com/mmtrt/WINE_AppImage/raw/master/wine.svg" height=100> | <img src="https://github.com/mmtrt/WINE_AppImage/raw/master/wine.svg" height=100> | <img src="https://github.com/mmtrt/WINE_AppImage/raw/master/wine.svg" height=100> |
-| [Download](https://github.com/mmtrt/WINE_AppImage/releases/tag/continuous-stable) | [Download](https://github.com/mmtrt/WINE_AppImage/releases/tag/continuous-devel) | [Download](https://github.com/mmtrt/WINE_AppImage/releases/tag/continuous-staging) |
+- 安装 fonts-noto-cjk 字体，用于显示中文
 
-### Executing
-#### File Manager
-Just double click the `*.AppImage` file and you are done!
+## 使用步骤
 
-> In normal cases, the above method should work, but in some rare cases
-the `+x` permissisions. So, right click > Properties > Allow Execution
-#### Terminal
-```bash
-./wine-*.AppImage
+1. 下载 Wine AppImage
+
+
+从以下地址下载最新的 Wine AppImage：
+
 ```
-```bash
+https://github.com/mmtrt/WINE_AppImage/
+
+如
+https://ghfast.top/github.com/mmtrt/WINE_AppImage/releases/download/continuous-staging/wine-staging_10.19-x86_64.AppImage
+```
+
+下载完成后，赋予执行权限, 并移动到 /usr/local/bin 目录下
+
+```
 chmod +x wine-*.AppImage
-./wine-*.AppImage
+sudo mv wine-*.AppImage /usr/local/bin/wine-staging.AppImage
 ```
 
-In case, if FUSE support libraries are not installed on the host system, it is
-still possible to run the AppImage
+2. 初始化和安装 Wine-Mono
+
+Wine-Mono 是 .NET Framework 的兼容实现，许多 Windows 应用程序需要它。
+
+执行以下命令进行初始化：
+```bash
+
+wine-staging.AppImage
+```
+
+然后安装 Wine-Mono：
 
 ```bash
-./wine-*.AppImage --appimage-extract
-cd squashfs-root
-./AppRun
+wine-staging.AppImage ~/.cache/wine/wine-mono*.msi
 ```
 
-## Building AppImage (Debian Based Host Only)
+3. 安装 Windows 应用程序
 
-#### > Clone this repo
-```
-git clone 'https://github.com/mmtrt/WINE_AppImage.git'
-```
+下载 Windows 应用程序的安装程序或安装包，例如 .exe 文件或 .msi 文件。
 
-#### > Download appimage-builder and unpack (AppRun v2)
-```
-cd WINE_AppImage ; wget -q 'https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.3/appimage-builder-1.0.3-x86_64.AppImage' ; chmod +x 'appimage-builder-1.0.3-x86_64.AppImage' ; ./appimage-builder-1.0.3-x86_64.AppImage --appimage-extract
-```
-#### > Download appimage-builder continuous build and unpack (AppRun v3)
-> NOTE: use this step for only WINE 9 and above AppImage recipe. below mentioned version may change in future.
-```
-cd WINE_AppImage ; wget -q 'https://github.com/AppImageCrafters/appimage-builder/releases/download/Continuous/appimage-builder-1.1.1.dev32+g2709a3b-x86_64.AppImage' ; chmod +x 'appimage-builder-1.1.1.dev32+g2709a3b-x86_64.AppImage' ; ./appimage-builder-1.1.1.dev32+g2709a3b-x86_64.AppImage --appimage-extract
+执行以下命令安装应用程序，安装完成后，建议不要直接启动，由桌面文件启动
+
+```bash
+wine-staging.AppImage setup.exe
 ```
 
-#### > Modify appimage-builder
-```
-cp runtime/mksquashfs squashfs-root/usr/bin/mksquashfs ; sed -i 's|xz|zstd|' squashfs-root/usr/lib/python3.8/site-packages/appimagebuilder/modules/prime/appimage_primer.py
-```
+4. 安装桌面文件和图标
 
-#### > Modify Recipe for building locally
-Change version in `wine-stable.yml` for example.
+执行应用程序目录下的 apps/install_apps.sh 脚本，将创建桌面启动器和应用程序图标，当前只支持企业微信
 
-version: `!ENV ${WINE_VER}` 
-
-To
-
-version: `"1.0"`
-
-
-#### > Start building
-Now launch modified appimage-builder using modifed recipe after doing above steps
-
-```
-squashfs-root/AppRun --recipe wine-stable.yml
+```bash
+bash apps/install_apps.sh
 ```
 
-**NOTE:** if you are making changes in recipe file after doing all steps then just skip all steps and use building step only.
+## 常用命令
 
-## Acknowledgements
-* https://www.winehq.org
-* https://github.com/AppImageCrafters/appimage-builder
+打开 Wine 配置
+
+```bash
+wine-staging.AppImage winecfg
+```
+
+打开注册表编辑器
+
+```bash
+wine-staging.AppImage regedit
+```
+
+运行 Windows 命令行
+
+```bash
+wine-staging.AppImage cmd
+```
+
+运行 Windows Explorer
+
+```bash
+wine-staging.AppImage explorer
+```

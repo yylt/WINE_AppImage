@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+X-Created-By=WINE Team
+Categories=chat;
+Icon=/usr/local/share/icons/hicolor/48x48/apps/com.qq.weixin.work.svg
+Exec="/usr/local/bin/wine_app.sh" -a wxwork
+Name=WeChat Work
+Name[zh_CN]=企业微信
+Comment=Tencent WeChat Work Client
+StartupWMClass=WXWork.exe
+Terminal=false
